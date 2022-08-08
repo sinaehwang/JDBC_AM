@@ -5,69 +5,49 @@ import java.util.List;
 import java.util.Scanner;
 
 public class Main {
-
 	public static void main(String[] args) {
-
 		Scanner sc = new Scanner(System.in);
-		
-		List<Article>articles = new ArrayList<>();
-		
-		int lastArticleId=0;
-		
+
+		List<Article> articles = new ArrayList<>();
+		int lastArticleId = 0;
 
 		while (true) {
-
-			System.out.print("명령어:");
-
+			System.out.printf("명령어) ");
 			String cmd = sc.nextLine().trim();
-			
-			if (cmd.equals("exist")) {
 
-				System.out.println("시스템을 종료합니다");
-
-				break;
-
-			}
-			
 			if (cmd.equals("article write")) {
-
-				int id = lastArticleId+1;
-				lastArticleId++;
-				
-				System.out.print("제목");
+				System.out.println("== 게시물 작성 ==");
+				int id = lastArticleId + 1;
+				System.out.printf("제목 : ");
 				String title = sc.nextLine();
-				System.out.print("내용");
+				System.out.printf("내용 : ");
 				String body = sc.nextLine();
-				
-				Article article = new Article(id,title,body);
-				articles.add(article);
-				
-				System.out.printf("%d번글이생성되었습니다.\n",article.id);
 
-				continue;
-			}
-			
-			else if(cmd.equals("article list")) {
-				System.out.println("===게시물리스트===");
-				
-				if(articles.size()==0) {
-					System.out.println("게시글이 없습니다.");
+				Article article = new Article(id, title, body);
+				articles.add(article);
+				lastArticleId++;
+
+				System.out.println(article);
+			} else if (cmd.equals("article list")) {
+				System.out.println("== 게시물 리스트 ==");
+
+				if (articles.size() == 0) {
+					System.out.println("게시물이 없습니다");
 					continue;
 				}
-				System.out.println("번호|제목");
- 				
-				for(Article article : articles) {
-					
-					System.out.printf("%d|%s\n",article.id,article.title);
+
+				System.out.println("번호  /  제목");
+
+				for (Article article : articles) {
+					System.out.printf("%d  /  %s\n", article.id, article.title);
 				}
-			}
-			
-			else {
-				System.out.println("존재하지않는명령어입니다.");
+
 			}
 
-
-
+			if (cmd.equals("exit")) {
+				System.out.println("프로그램을 종료합니다");
+				break;
+			}
 		}
 	}
 }
