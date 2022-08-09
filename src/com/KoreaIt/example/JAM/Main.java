@@ -13,7 +13,6 @@ public class Main {
 	public static void main(String[] args) {
 		Scanner sc = new Scanner(System.in);
 
-		//List<Article> articles = new ArrayList<>();//더이상 articles에 추가하지않고 db에 담기떄문에 필요없다.
 		int lastArticleId = 0;
 
 		while (true) {
@@ -29,8 +28,7 @@ public class Main {
 				String body = sc.nextLine();
 
 				Article article = new Article(id, title, body);
-				//articles.add(article);
-				
+
 				Connection conn = null;
 				PreparedStatement pstmt = null;
 
@@ -45,15 +43,13 @@ public class Main {
 					sql += " SET regDate = NOW()";
 					sql += ", updateDate = NOW()";
 					sql += ", title = '" + title + "'";
-					sql += ", `body` = '" + body + "';";
+					sql += ", `body` = '" + body + "'";
 
 					System.out.println(sql);
 
 					pstmt = conn.prepareStatement(sql);
 
-					int affectedRows = pstmt.executeUpdate();
-
-					System.out.println("affectedRows : " + affectedRows);
+					pstmt.executeUpdate();
 
 				} catch (ClassNotFoundException e) {
 					System.out.println("드라이버 로딩 실패");
@@ -75,18 +71,70 @@ public class Main {
 						e.printStackTrace();
 					}
 				}
+
 				lastArticleId++;
 
 				System.out.println(article);
-				
+			} else if (cmd.startsWith("article modify ")) {
+				int id = Integer.parseInt(cmd.split(" ")[2]);
+
+				System.out.printf("== %d번 게시물 수정 ==\n", id);
+				System.out.printf("새 제목 : ");
+				String title = sc.nextLine();
+				System.out.printf("새 내용 : ");
+				String body = sc.nextLine();
+
+				Connection conn = null;
+				PreparedStatement pstmt = null;
+
+				try {
+					Class.forName("com.mysql.jdbc.Driver");
+					String url = "jdbc:mysql://127.0.0.1:3306/article_manager?useUnicode=true&characterEncoding=utf8&autoReconnect=true&serverTimezone=Asia/Seoul&useOldAliasMetadataBehavior=true&zeroDateTimeNehavior=convertToNull";
+
+					conn = DriverManager.getConnection(url, "root", "");
+					System.out.println("연결 성공!");
+
+					String sql = "UPDATE article";
+					sql += " SET updateDate = NOW()";
+					sql += ", title = '" + title + "'";
+					sql += ", `body` = '" + body + "'";
+					sql += " WHERE id = " + id;
+
+					System.out.println(sql);
+
+					pstmt = conn.prepareStatement(sql);
+
+					pstmt.executeUpdate();
+
+				} catch (ClassNotFoundException e) {
+					System.out.println("드라이버 로딩 실패");
+				} catch (SQLException e) {
+					System.out.println("에러: " + e);
+				} finally {
+					try {
+						if (conn != null && !conn.isClosed()) {
+							conn.close();
+						}
+					} catch (SQLException e) {
+						e.printStackTrace();
+					}
+					try {
+						if (pstmt != null && !pstmt.isClosed()) {
+							pstmt.close();
+						}
+					} catch (SQLException e) {
+						e.printStackTrace();
+					}
+				}
+				System.out.printf("%d번 게시물이 수정 되었습니다\n", id);
+
 			} else if (cmd.equals("article list")) {
 				System.out.println("== 게시물 리스트 ==");
-
 				Connection conn = null;
 				PreparedStatement pstmt = null;
 				ResultSet rs = null;
 
-				List<Article> articles = new ArrayList<>();//밑에 db조립된 article을 담는장소가됨
+				List<Article> articles = new ArrayList<>();
 
 				try {
 					Class.forName("com.mysql.jdbc.Driver");
@@ -143,8 +191,6 @@ public class Main {
 					}
 				}
 
-				System.out.println("결과 : " + articles);
-				
 				if (articles.size() == 0) {
 					System.out.println("게시물이 없습니다");
 					continue;
@@ -163,5 +209,6 @@ public class Main {
 				break;
 			}
 		}
+
 	}
 }
