@@ -11,6 +11,8 @@ public class Article extends Object {
 	public String title;
 	public String body;
 
+
+
 	public Article(int id, LocalDateTime regDate, LocalDateTime updateDate, String title, String body) {
 		this.id = id;
 		this.regDate = regDate;
@@ -18,6 +20,8 @@ public class Article extends Object {
 		this.title = title;
 		this.body = body;
 	}
+	
+
 
 	public Article(Map<String, Object> articleMap) {
 		this.id = (int) articleMap.get("id");
@@ -26,6 +30,8 @@ public class Article extends Object {
 		this.title = (String) articleMap.get("title");
 		this.body = (String) articleMap.get("body");
 	}
+	
+	
 
 	@Override
 	public String toString() {
