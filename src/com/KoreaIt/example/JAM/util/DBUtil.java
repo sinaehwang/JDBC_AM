@@ -105,6 +105,7 @@ public class DBUtil {
 
 		for (String key : row.keySet()) {
 			return ((int) row.get(key)) == 1;
+			
 		}
 
 		return false;
