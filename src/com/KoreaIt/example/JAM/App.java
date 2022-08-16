@@ -3,16 +3,10 @@ package com.KoreaIt.example.JAM;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
 import java.util.Scanner;
 
 import com.KoreaIt.example.JAM.controller.ArticleController;
 import com.KoreaIt.example.JAM.controller.MemberController;
-import com.KoreaIt.example.JAM.util.DBUtil;
-import com.KoreaIt.example.JAM.util.SecSql;
 
 public class App {
 
@@ -64,48 +58,30 @@ public class App {
 
 	private int action(Connection conn, Scanner sc, String cmd) {
 
-		MemberController memberController = new MemberController();
-		memberController.setConn(conn);
-		memberController.setScanner(sc);
-		
-		ArticleController articleController = new ArticleController();
-		articleController.setConn(conn);
-		articleController.setScanner(sc);
-
-		if (cmd.equals("member join")) {
-
-			memberController.doJoin(cmd);
-
-		}
-
-		if (cmd.equals("article write")) {
-
-			articleController.doWrite(cmd);
-
-		} else if (cmd.startsWith("article delete ")) {
-
-			articleController.doDelete(cmd);
-
-		} else if (cmd.startsWith("article detail ")) {
-
-			articleController.showDetail(cmd);
-
-		} else if (cmd.startsWith("article modify ")) {
-
-			articleController.doModify(cmd);
-
-		} else if (cmd.equals("article list")) {
-
-			articleController.showList(cmd);
-
-		} else {
-			System.out.println("존재하지 않는 명령어 입니다");
-		}
-
 		if (cmd.equals("exit")) {
 			System.out.println("프로그램을 종료합니다");
 			return -1;
 		}
+
+		MemberController memberController = new MemberController(conn, sc);
+		ArticleController articleController = new ArticleController(conn, sc);
+
+		if (cmd.equals("member join")) {
+			memberController.doJoin(cmd);
+		} else if (cmd.equals("article write")) {
+			articleController.doWrite(cmd);
+		} else if (cmd.startsWith("article delete ")) {
+			articleController.doDelete(cmd);
+		} else if (cmd.startsWith("article detail ")) {
+			articleController.showDetail(cmd);
+		} else if (cmd.startsWith("article modify ")) {
+			articleController.doModify(cmd);
+		} else if (cmd.equals("article list")) {
+			articleController.showList(cmd);
+		} else {
+			System.out.println("존재하지 않는 명령어 입니다");
+		}
+
 		return 0;
 	}
 

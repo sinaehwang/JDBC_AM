@@ -7,85 +7,61 @@ import java.util.Map;
 import java.util.Scanner;
 
 import com.KoreaIt.example.JAM.Article;
+import com.KoreaIt.example.JAM.service.ArticleService;
 import com.KoreaIt.example.JAM.util.DBUtil;
 import com.KoreaIt.example.JAM.util.SecSql;
 
-public class ArticleController {
-	private Connection conn;
-	private Scanner sc;
+public class ArticleController extends Controller {
 
-	public void setConn(Connection conn) {
-		this.conn = conn;
-	}
+	private ArticleService articleService;
 
-	public void setScanner(Scanner sc) {
-		this.sc = sc;
+	public ArticleController(Connection conn, Scanner sc) {
+		super(sc);
+		articleService = new ArticleService(conn);
 	}
 
 	public void doWrite(String cmd) {
-	
 		System.out.println("== 게시물 작성 ==");
 		System.out.printf("제목 : ");
 		String title = sc.nextLine();
 		System.out.printf("내용 : ");
 		String body = sc.nextLine();
 
-		SecSql sql = new SecSql();
-
-		sql.append("INSERT INTO article");
-		sql.append(" SET regDate = NOW()");
-		sql.append(", updateDate = NOW()");
-		sql.append(", title = ?", title);
-		sql.append(", `body = ?", body);
-
-		int id = DBUtil.insert(conn, sql);
+		int id = articleService.doWrite(title, body);
 
 		System.out.printf("%d번 게시물이 생성되었습니다.\n", id);
-		
+
 	}
 
 	public void doDelete(String cmd) {
-		
 		int id = Integer.parseInt(cmd.split(" ")[2]);
 
-		SecSql sql = new SecSql();
-		sql.append("SELECT COUNT(*)");
-		sql.append("FROM article");
-		sql.append("WHERE id = ?", id);
+		boolean isArticleExists = articleService.isArticleExists(id);
 
-		int articlesCount = DBUtil.selectRowIntValue(conn, sql);
-
-		if (articlesCount == 0) {
+		if (isArticleExists == false) {
 			System.out.printf("%d번 게시글은 존재하지 않습니다.\n", id);
-			
 			return;
 		}
 
 		System.out.printf("== %d번 게시물 삭제 ==\n", id);
 
-		sql = new SecSql();
-		sql.append("DELETE FROM article");
-		sql.append("WHERE id = ?", id);
-
-		DBUtil.delete(conn, sql);
+		articleService.doDelete(id);
 
 		System.out.printf("%d번 게시물이 삭제 되었습니다\n", id);
+
 	}
 
 	public void showDetail(String cmd) {
 		int id = Integer.parseInt(cmd.split(" ")[2]);
+		
+		boolean isArticleExists = articleService.isArticleExists(id);
 
-		SecSql sql = new SecSql();
-		sql.append("SELECT *");
-		sql.append("FROM article");
-		sql.append("WHERE id = ?", id);
-
-		Map<String, Object> articleMap = DBUtil.selectRow(conn, sql);
-
-		if (articleMap.isEmpty()) {
+		if (isArticleExists == false) {
 			System.out.printf("%d번 게시글은 존재하지 않습니다.\n", id);
 			return;
 		}
+
+		Map<String, Object> articleMap = articleService.selectRow(id);
 
 		System.out.printf("== %d번 게시물 상세보기 ==\n", id);
 
@@ -96,11 +72,18 @@ public class ArticleController {
 		System.out.printf("수정날짜 : %s\n", article.updateDate);
 		System.out.printf("제목 : %s\n", article.title);
 		System.out.printf("내용 : %s\n", article.body);
-		
+
 	}
 
 	public void doModify(String cmd) {
 		int id = Integer.parseInt(cmd.split(" ")[2]);
+		
+		boolean isArticleExists = articleService.isArticleExists(id);
+
+		if (isArticleExists == false) {
+			System.out.printf("%d번 게시글은 존재하지 않습니다.\n", id);
+			return;
+		}
 
 		System.out.printf("== %d번 게시물 수정 ==\n", id);
 		System.out.printf("새 제목 : ");
@@ -108,41 +91,20 @@ public class ArticleController {
 		System.out.printf("새 내용 : ");
 		String body = sc.nextLine();
 
-		SecSql sql = new SecSql();
-
-		sql.append("UPDATE article");
-		sql.append(" SET updateDate = NOW()");
-		sql.append(", title = ?", title);
-		sql.append(", `body` = ?", body);
-		sql.append(" WHERE id = ?", id);
-
-		DBUtil.update(conn, sql);
+		articleService.doUpdate(id,title,body);
 
 		System.out.printf("%d번 게시물이 수정 되었습니다\n", id);
-
-		
 	}
+
 
 	public void showList(String cmd) {
 		System.out.println("== 게시물 리스트 ==");
 
-		List<Article> articles = new ArrayList<>();
-
-		SecSql sql = new SecSql();
-
-		sql.append("SELECT *");
-		sql.append("FROM article");
-		sql.append("ORDER BY id DESC");
-
-		List<Map<String, Object>> articlesListMap = DBUtil.selectRows(conn, sql);
-
-		for (Map<String, Object> articleMap : articlesListMap) {
-			articles.add(new Article(articleMap));
-		}
+		List<Article> articles = articleService.getArticles();
 
 		if (articles.size() == 0) {
 			System.out.println("게시물이 없습니다");
-			return ;
+			return;
 		}
 
 		System.out.println("번호  /  제목");
@@ -150,7 +112,7 @@ public class ArticleController {
 		for (Article article : articles) {
 			System.out.printf("%d  /  %s\n", article.id, article.title);
 		}
-		
+
 	}
 
 }
