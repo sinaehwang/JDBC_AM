@@ -7,15 +7,18 @@ import java.util.Scanner;
 
 import com.KoreaIt.example.JAM.controller.ArticleController;
 import com.KoreaIt.example.JAM.controller.MemberController;
+import com.KoreaIt.example.container.Container;
 
 public class App {
 
 	public void run() {
-		Scanner sc = new Scanner(System.in);
+		Container.sc = new Scanner(System.in);
+
+		Container.init();
 
 		while (true) {
 			System.out.printf("명령어) ");
-			String cmd = sc.nextLine().trim();
+			String cmd = Container.sc.nextLine().trim();
 
 			// DB 연결
 			Connection conn = null;
@@ -34,7 +37,9 @@ public class App {
 			try {
 				conn = DriverManager.getConnection(url, "root", "");
 
-				int actionResult = action(conn, sc, cmd);
+				Container.conn = conn;
+
+				int actionResult = action(cmd);
 
 				if (actionResult == -1) {
 					break;
@@ -56,21 +61,21 @@ public class App {
 		}
 	}
 
-	private int action(Connection conn, Scanner sc, String cmd) {
+	private int action(String cmd) {
 
 		if (cmd.equals("exit")) {
 			System.out.println("프로그램을 종료합니다");
 			return -1;
 		}
 
-		MemberController memberController = new MemberController(conn, sc);
-		ArticleController articleController = new ArticleController(conn, sc);
+		MemberController memberController = Container.memberController;
+		ArticleController articleController = Container.articleController;
 
 		if (cmd.equals("member join")) {
 			memberController.doJoin(cmd);
-		}else if (cmd.equals("member login")) {
-			memberController.doLogin(cmd);
-		}else if (cmd.equals("article write")) {
+		} else if (cmd.equals("member login")) {
+			memberController.login(cmd);
+		} else if (cmd.equals("article write")) {
 			articleController.doWrite(cmd);
 		} else if (cmd.startsWith("article delete ")) {
 			articleController.doDelete(cmd);

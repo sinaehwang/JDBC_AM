@@ -1,23 +1,17 @@
 package com.KoreaIt.example.JAM.controller;
 
-import java.sql.Connection;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.Scanner;
 
 import com.KoreaIt.example.JAM.Article;
 import com.KoreaIt.example.JAM.service.ArticleService;
-import com.KoreaIt.example.JAM.util.DBUtil;
-import com.KoreaIt.example.JAM.util.SecSql;
+import com.KoreaIt.example.container.Container;
 
 public class ArticleController extends Controller {
 
 	private ArticleService articleService;
 
-	public ArticleController(Connection conn, Scanner sc) {
-		super(sc);
-		articleService = new ArticleService(conn);
+	public ArticleController() {
+		articleService = Container.articleService;
 	}
 
 	public void doWrite(String cmd) {
@@ -53,19 +47,15 @@ public class ArticleController extends Controller {
 
 	public void showDetail(String cmd) {
 		int id = Integer.parseInt(cmd.split(" ")[2]);
-		
-		boolean isArticleExists = articleService.isArticleExists(id);
 
-		if (isArticleExists == false) {
+		Article article = articleService.getArticleById(id);
+
+		if (article == null) {
 			System.out.printf("%d번 게시글은 존재하지 않습니다.\n", id);
 			return;
 		}
 
-		Map<String, Object> articleMap = articleService.selectRow(id);
-
 		System.out.printf("== %d번 게시물 상세보기 ==\n", id);
-
-		Article article = new Article(articleMap);
 
 		System.out.printf("번호 : %d\n", article.id);
 		System.out.printf("작성날짜 : %s\n", article.regDate);
@@ -77,10 +67,10 @@ public class ArticleController extends Controller {
 
 	public void doModify(String cmd) {
 		int id = Integer.parseInt(cmd.split(" ")[2]);
-		
-		boolean isArticleExists = articleService.isArticleExists(id);
 
-		if (isArticleExists == false) {
+		Article article = articleService.getArticleById(id);
+
+		if (article == null) {
 			System.out.printf("%d번 게시글은 존재하지 않습니다.\n", id);
 			return;
 		}
@@ -91,11 +81,10 @@ public class ArticleController extends Controller {
 		System.out.printf("새 내용 : ");
 		String body = sc.nextLine();
 
-		articleService.doUpdate(id,title,body);
+		articleService.doUpdate(id, title, body);
 
 		System.out.printf("%d번 게시물이 수정 되었습니다\n", id);
 	}
-
 
 	public void showList(String cmd) {
 		System.out.println("== 게시물 리스트 ==");

@@ -6,12 +6,13 @@ import java.util.Map;
 
 import com.KoreaIt.example.JAM.Article;
 import com.KoreaIt.example.JAM.dao.ArticleDao;
+import com.KoreaIt.example.container.Container;
 
 public class ArticleService {
 	private ArticleDao articleDao;
 
-	public ArticleService(Connection conn) {
-		articleDao = new ArticleDao(conn);
+	public ArticleService() {
+		articleDao = Container.articleDao;
 	}
 
 	public int doWrite(String title, String body) {
@@ -27,18 +28,18 @@ public class ArticleService {
 		articleDao.doDelete(id);
 	}
 
-	public Map<String, Object> selectRow(int id) {
-		
-		return articleDao.selectRow(id);
+	public Article getArticleById(int id) {
+
+		return articleDao.getArticleById(id);
 	}
 
 	public void doUpdate(int id, String title, String body) {
-		articleDao.doUpdate(id,title,body);
-		
+		articleDao.doUpdate(id, title, body);
+
 	}
 
-public List<Article> getArticles() {
-		
+	public List<Article> getArticles() {
+
 		return articleDao.getArticles();
 	}
 

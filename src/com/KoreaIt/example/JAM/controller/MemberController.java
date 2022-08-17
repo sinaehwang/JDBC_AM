@@ -1,18 +1,14 @@
 package com.KoreaIt.example.JAM.controller;
 
-import java.sql.Connection;
-import java.util.Scanner;
-
 import com.KoreaIt.example.JAM.Member;
 import com.KoreaIt.example.JAM.service.MemberService;
+import com.KoreaIt.example.container.Container;
 
 public class MemberController extends Controller {
-
 	private MemberService memberService;
 
-	public MemberController(Connection conn, Scanner sc) {
-		super(sc);
-		memberService = new MemberService(conn);
+	public MemberController() {
+		memberService = Container.memberService;
 
 	}
 
@@ -90,27 +86,27 @@ public class MemberController extends Controller {
 
 	}
 
-
-	public void doLogin(String cmd) {
-
-		System.out.println("== 로그인하기 ==");
+	public void login(String cmd) {
 		String loginId = null;
 		String loginPw = null;
 
+		System.out.println("== 로그인 ==");
+		// id 입력
 		while (true) {
-			System.out.printf("아이디:");
-			loginId = sc.nextLine();
+			System.out.printf("아이디 : ");
+			loginId = sc.nextLine().trim();
 			if (loginId.length() == 0) {
-				System.out.println("아이디를 입력해주시기 바랍니다.");
+				System.out.println("아이디를 입력해주세요");
 				continue;
 			}
+
 			boolean isLoginIdDup = memberService.isLoginIdDup(loginId);
 
 			if (isLoginIdDup == false) {
-				System.out.printf("%s 해당아이디는 존재하지않습니다.\n", loginId);
+				System.out.printf("%s는(은) 존재하지 않는 아이디입니다.\n", loginId);
 				continue;
-
 			}
+
 			break;
 		}
 
@@ -121,29 +117,29 @@ public class MemberController extends Controller {
 
 		while (true) {
 			if (tryCount >= tryMaxCount) {
-				System.out.println("비밀번호를 확인하고 다시시도해주세요");
+				System.out.println("비밀번호를 확인하고 다시 시도해주세요.");
 				break;
 			}
 
-			System.out.printf("비밀번호:");
+			System.out.printf("비밀번호 : ");
 			loginPw = sc.nextLine().trim();
 
 			if (loginPw.length() == 0) {
 				tryCount++;
-				System.out.println("비밀번호를 입력해주시기 바랍니다.\n");
+				System.out.println("비밀번호를 입력해주세요");
 				continue;
 			}
 
 			if (member.loginPw.equals(loginPw) == false) {
 				tryCount++;
-				System.out.println("비밀번호가 일치하지않습니다.\n");
+				System.out.println("비밀번호가 일치하지 않습니다.");
 				continue;
 			}
-			
-			System.out.printf("%s회원님 로그인성공\n", member.name);
 
+			System.out.printf("%s님 환영합니다.\n", member.name);
 			break;
 		}
 
 	}
+
 }

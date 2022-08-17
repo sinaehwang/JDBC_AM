@@ -1,15 +1,14 @@
 package com.KoreaIt.example.JAM.service;
 
-import java.sql.Connection;
-
 import com.KoreaIt.example.JAM.Member;
 import com.KoreaIt.example.JAM.dao.MemberDao;
+import com.KoreaIt.example.container.Container;
 
 public class MemberService {
 	private MemberDao memberDao;
 
-	public MemberService(Connection conn) {
-		memberDao = new MemberDao(conn);
+	public MemberService() {
+		memberDao = Container.memberDao;
 	}
 
 	public boolean isLoginIdDup(String loginId) {
@@ -21,7 +20,6 @@ public class MemberService {
 	}
 
 	public Member getMemberByLoginId(String loginId) {
-		
 		return memberDao.getMemberByLoginId(loginId);
 	}
 
