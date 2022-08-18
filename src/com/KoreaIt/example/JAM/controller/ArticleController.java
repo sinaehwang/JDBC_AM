@@ -116,10 +116,10 @@ public class ArticleController extends Controller {
 			return;
 		}
 
-		System.out.println("번호  /  제목");
+		System.out.println("번호  /  제목/  작성자");
 
 		for (Article article : articles) {
-			System.out.printf("%d  /  %s\n", article.id, article.title);
+			System.out.printf("%d  /  %s/  %s\n", article.id, article.title,article.extra__writer);
 		}
 
 	}
