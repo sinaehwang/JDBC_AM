@@ -1,8 +1,6 @@
 package com.KoreaIt.example.JAM.service;
 
-import java.sql.Connection;
 import java.util.List;
-import java.util.Map;
 
 import com.KoreaIt.example.JAM.Article;
 import com.KoreaIt.example.JAM.dao.ArticleDao;
@@ -15,9 +13,9 @@ public class ArticleService {
 		articleDao = Container.articleDao;
 	}
 
-	public int doWrite(String title, String body,int memberId) {
+	public int doWrite(int memberId, String title, String body) {
 
-		return articleDao.doWrite(title, body,memberId);
+		return articleDao.doWrite(memberId, title, body);
 	}
 
 	public boolean isArticleExists(int id) {
@@ -41,6 +39,10 @@ public class ArticleService {
 	public List<Article> getArticles() {
 
 		return articleDao.getArticles();
+	}
+
+	public void increaseHit(int id) {
+		articleDao.increaseHit(id);
 	}
 
 }

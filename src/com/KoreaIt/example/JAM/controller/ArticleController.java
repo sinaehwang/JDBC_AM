@@ -26,10 +26,10 @@ public class ArticleController extends Controller {
 		String title = sc.nextLine();
 		System.out.printf("내용 : ");
 		String body = sc.nextLine();
-		
+
 		int memberId = Container.session.loginedMemberId;
 
-		int id = articleService.doWrite(title, body,memberId);
+		int id = articleService.doWrite(memberId, title, body);
 
 		System.out.printf("%d번 게시물이 생성되었습니다.\n", id);
 
@@ -62,6 +62,7 @@ public class ArticleController extends Controller {
 	public void showDetail(String cmd) {
 		int id = Integer.parseInt(cmd.split(" ")[2]);
 
+		articleService.increaseHit(id);
 		Article article = articleService.getArticleById(id);
 
 		if (article == null) {
@@ -74,8 +75,10 @@ public class ArticleController extends Controller {
 		System.out.printf("번호 : %d\n", article.id);
 		System.out.printf("작성날짜 : %s\n", article.regDate);
 		System.out.printf("수정날짜 : %s\n", article.updateDate);
+		System.out.printf("작성자 : %s\n", article.extra__writer);
 		System.out.printf("제목 : %s\n", article.title);
 		System.out.printf("내용 : %s\n", article.body);
+		System.out.printf("조회수 : %d\n", article.hit);
 
 	}
 
@@ -116,10 +119,11 @@ public class ArticleController extends Controller {
 			return;
 		}
 
-		System.out.println("번호  /  제목/  작성자");
+		System.out.printf("번호  /  %8s         /  제목   /  작성자   /  조회수\n", "작성날짜");
 
 		for (Article article : articles) {
-			System.out.printf("%d  /  %s/  %s\n", article.id, article.title,article.extra__writer);
+			System.out.printf("%4d  /  %s  /  %s  /  %s  /  %d\n", article.id, article.regDate, article.title,
+					article.extra__writer,article.hit);
 		}
 
 	}

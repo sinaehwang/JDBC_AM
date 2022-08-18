@@ -1,6 +1,5 @@
 package com.KoreaIt.example.JAM.dao;
 
-import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -15,15 +14,15 @@ public class ArticleDao {
 	public ArticleDao() {
 	}
 
-	public int doWrite(String title, String body,int memberId) {
+	public int doWrite(int memberId, String title, String body) {
 		SecSql sql = new SecSql();
 
 		sql.append("INSERT INTO article");
 		sql.append(" SET regDate = NOW()");
 		sql.append(", updateDate = NOW()");
+		sql.append(", memberId = ?", memberId);
 		sql.append(", title = ?", title);
 		sql.append(", `body` = ?", body);
-		sql.append(", `memberId` = ?", memberId);
 
 		int id = DBUtil.insert(Container.conn, sql);
 
@@ -50,9 +49,11 @@ public class ArticleDao {
 	public Article getArticleById(int id) {
 
 		SecSql sql = new SecSql();
-		sql.append("SELECT *");
-		sql.append("FROM article");
-		sql.append("WHERE id = ?", id);
+		sql.append("SELECT A.*,M.name AS extra__writer");
+		sql.append("FROM article AS A");
+		sql.append("INNER JOIN `member` AS M");
+		sql.append("ON A.memberId = M.id");
+		sql.append("WHERE A.id = ?", id);
 
 		Map<String, Object> articleMap = DBUtil.selectRow(Container.conn, sql);
 
@@ -78,11 +79,11 @@ public class ArticleDao {
 	public List<Article> getArticles() {
 		SecSql sql = new SecSql();
 
-		sql.append("SELECT A.*,M.name AS extra__writer");
+		sql.append("SELECT A.*, M.name AS extra__writer");
 		sql.append("FROM article AS A");
 		sql.append("INNER JOIN member AS M");
-		sql.append("ON A.memberId =M.id");
-		sql.append("ORDER BY id DESC");
+		sql.append("ON A.memberId = M.id");
+		sql.append("ORDER BY A.id DESC");
 
 		List<Map<String, Object>> articlesListMap = DBUtil.selectRows(Container.conn, sql);
 
@@ -93,6 +94,16 @@ public class ArticleDao {
 		}
 
 		return articles;
+	}
+
+	public void increaseHit(int id) {
+		SecSql sql = new SecSql();
+
+		sql.append("UPDATE article");
+		sql.append("SET hit = hit + 1");
+		sql.append("WHERE id = ?", id);
+
+		DBUtil.update(Container.conn, sql);
 	}
 
 }
