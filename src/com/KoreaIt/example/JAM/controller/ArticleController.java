@@ -137,7 +137,7 @@ public class ArticleController extends Controller {
 
 		int itemsInAPage = 10;
 
-		// 임시데이터
+		// 임시데이터(페이지수)
 		itemsInAPage = 3;
 
 		List<Article> articles = articleService.getForPrintArticles(page, itemsInAPage, searchKeyword);
